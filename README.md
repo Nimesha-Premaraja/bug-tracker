@@ -285,7 +285,6 @@ nginx:
 ---
 
 ```
-License: MIT License
 Support: For issues and questions, please open an issue in the repository.
-Author: Nimesha Dilshan
+Author: Nimesha Premaraja
 ```

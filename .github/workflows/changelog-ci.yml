@@ -2,7 +2,7 @@ name: Changelog CI
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened]
 
 permissions:
   contents: write
@@ -14,9 +14,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          fetch-tags: true
 
       - name: Get latest release version
         id: latest_release
