@@ -48,7 +48,7 @@ This Bug Tracking System is built with Python Flask and PostgreSQL, designed to 
 
 ## Tech Stack
 
-### Infrastructure
+### Infrastructure and Platform
 - **Containerization**: Docker
 - **Orchestration**: Docker Compose
 - **Web Server**: Gunicorn
@@ -285,7 +285,6 @@ nginx:
 ---
 
 ```
-License: MIT License
 Support: For issues and questions, please open an issue in the repository.
-Author: Nimesha Dilshan
+Author: Nimesha Premaraja
 ```
