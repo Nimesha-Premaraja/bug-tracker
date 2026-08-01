@@ -48,7 +48,7 @@ This Bug Tracking System is built with Python Flask and PostgreSQL, designed to 
 
 ## Tech Stack
 
-### Infrastructure
+### Infrastructure and Platform
 - **Containerization**: Docker
 - **Orchestration**: Docker Compose
 - **Web Server**: Gunicorn
