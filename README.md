@@ -1,6 +1,28 @@
-# Bug Tracking System
+# Bug Tracker
 
-This Bug Tracking System is built with Python Flask and PostgreSQL, designed to streamline issue management. It features a role-based access control system that defines specific workflows for Admins, Developers, and Testers to ensure secure and organized collaboration. Users can efficiently track bugs through their entire lifecycle with integrated tools for file attachments, priority settings, and detailed commenting. Additionally, the system provides visual insights into project health via an interactive dashboard that monitors bug status distribution and recent team activity.
+This Bug Tracking System is built with Python Flask and PostgreSQL, designed to streamline issue management in Software Development Life Cycle (SDLC). It features a role-based access control system that defines specific workflows for Admins, Developers, and Testers to ensure secure and organized collaboration. Users can efficiently track bugs through their entire lifecycle with integrated tools for file attachments, priority settings, and detailed commenting. Additionally, the system provides visual insights into project health via an interactive dashboard that monitors bug status distribution and recent team activity.
+
+## Tech Stack
+
+### Infrastructure and Platform
+- **Containerization**: Docker
+- **Orchestration**: Docker Compose
+- **Web Server**: Gunicorn
+- **Reverse Proxy**: Can use Nginx
+
+### Backend
+- **Framework**: Flask 3.0.3
+- **Database ORM**: Flask-SQLAlchemy
+- **Database**: PostgreSQL
+- **Authentication**: Flask-Login, Werkzeug
+- **Forms**: WTForms
+- **Validation**: email-validator
+
+### Frontend
+- **Markup**: HTML5 with Jinja2 templates
+- **Styling**: CSS3 (Responsive design)
+- **JavaScript**: Vanilla JS with Fetch API
+- **Charts**: Chart.js 4.4.0
 
 ## Features
 
@@ -45,28 +67,6 @@ This Bug Tracking System is built with Python Flask and PostgreSQL, designed to 
 - Bugs by status chart (pie/doughnut)
 - Bugs by priority chart (bar)
 - Recent bugs activity feed
-
-## Tech Stack
-
-### Infrastructure and Platform
-- **Containerization**: Docker
-- **Orchestration**: Docker Compose
-- **Web Server**: Gunicorn
-- **Reverse Proxy**: Can use Nginx
-
-### Backend
-- **Framework**: Flask 3.0.3
-- **Database ORM**: Flask-SQLAlchemy
-- **Database**: PostgreSQL
-- **Authentication**: Flask-Login, Werkzeug
-- **Forms**: WTForms
-- **Validation**: email-validator
-
-### Frontend
-- **Markup**: HTML5 with Jinja2 templates
-- **Styling**: CSS3 (Responsive design)
-- **JavaScript**: Vanilla JS with Fetch API
-- **Charts**: Chart.js 4.4.0
 
 ### Prerequisites
 

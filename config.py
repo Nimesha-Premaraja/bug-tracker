@@ -15,6 +15,13 @@ class Config:
     UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', 'app/uploads')
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'txt', 'log', 'pdf', 'docx'}
     
+    # PDF Export settings
+    PDF_FONT_SIZE = 10
+    PDF_PAGE_SIZE = 'A4'
+    PDF_MARGIN = 20
+    PDF_MAX_BUGS_PER_EXPORT = 500
+    PDF_BUGS_PER_PAGE = 20
+    
     # Database
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 
         'postgresql://buguser:bugpass@localhost:5432/bugtracker')

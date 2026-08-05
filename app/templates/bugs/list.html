@@ -2,9 +2,16 @@
 
 {% block title %}Bugs - Bug Tracker{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pdf_export.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="bugs-container">
-    <h1>Bugs</h1>
+    <div class="bugs-header">
+        <h1>Bugs</h1>
+        <button id="exportPdfBtn" class="btn btn-secondary">Export to PDF</button>
+    </div>
 
     <div class="filter-section">
         <form method="GET" class="filter-form">
@@ -80,5 +87,64 @@
     </div>
 </div>
 
+<!-- PDF Export Modal -->
+<div id="exportPdfModal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <h2>Export Bugs to PDF</h2>
+        
+        <div class="modal-body">
+            <p>Choose what to export:</p>
+            
+            <div class="export-options">
+                <label class="radio-label">
+                    <input type="radio" name="export-scope" value="current-page" checked>
+                    <span>Current Page Only</span>
+                    <small id="current-page-count">Loading...</small>
+                </label>
+                
+                <label class="radio-label">
+                    <input type="radio" name="export-scope" value="all-results">
+                    <span>All Results Matching Filters</span>
+                    <small id="all-results-count">Loading...</small>
+                </label>
+            </div>
+            
+            <div id="export-warning" class="warning-message" style="display: none;">
+                <strong>Warning:</strong> <span id="warning-text"></span>
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <button id="cancelExportBtn" class="btn btn-secondary">Cancel</button>
+            <button id="confirmExportBtn" class="btn btn-primary">Export</button>
+        </div>
+        
+        <div id="loading-indicator" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Generating PDF Report...</p>
+        </div>
+    </div>
+</div>
+
 <a href="{{ url_for('bugs.create_bug') }}" class="fab btn-primary"><i class="fas fa-plus"></i></a>
+
+<!-- Pass data to JavaScript -->
+<script>
+    window.bugsFilterData = {
+        search: "{{ search }}",
+        status: "{{ status }}",
+        priority: "{{ priority }}",
+        assignee_id: "{{ assignee_id }}",
+        page: {{ bugs.page }},
+        total_pages: {{ bugs.pages }},
+        current_page_items: {{ bugs.items|length }},
+        total_items: {{ bugs.total }}
+    };
+</script>
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/pdf_export.js') }}"></script>
 {% endblock %}
+{% endblock %}
+
