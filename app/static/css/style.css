@@ -382,18 +382,6 @@ label {
     text-align: center;
 }
 
-.default-credentials {
-    margin-top: 2rem;
-    padding: 1rem;
-    background-color: var(--light);
-    border-radius: 4px;
-    font-size: 0.9rem;
-}
-
-.default-credentials ul {
-    margin: 0.5rem 0 0 1.5rem;
-}
-
 .dashboard {
     animation: fadeIn 0.3s ease-in;
 }

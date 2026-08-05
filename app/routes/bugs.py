@@ -1,10 +1,12 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, send_file
 from flask_login import login_required, current_user
 from app.models import db, Bug, Comment, Attachment, User
+from app.utils_pdf import BugReportGenerator
 from app.utils import role_required, allowed_file
 from datetime import datetime
 from werkzeug.utils import secure_filename
 import os
+import io
 
 bugs_bp = Blueprint('bugs', __name__)
 
@@ -238,3 +240,108 @@ def delete_attachment(attachment_id):
     
     flash('Attachment deleted successfully.', 'success')
     return redirect(url_for('bugs.detail_bug', bug_id=bug_id))
+
+@bugs_bp.route('/export-pdf', methods=['POST'])
+@login_required
+def export_pdf():
+    """
+    Export bugs to PDF report.
+    Accepts query parameters to filter bugs and export scope.
+    """
+    try:
+        # Get query parameters from request
+        page = request.form.get('page', 1, type=int)
+        search = request.form.get('search', '', type=str)
+        status = request.form.get('status', '', type=str)
+        assignee_id = request.form.get('assignee_id', '', type=str)
+        priority = request.form.get('priority', '', type=str)
+        sort_by = request.form.get('sort', 'created_at', type=str)
+        sort_order = request.form.get('order', 'desc', type=str)
+        export_all = request.form.get('export_all', 'false').lower() == 'true'
+        
+        # Build query with filters
+        query = Bug.query
+        
+        if search:
+            query = query.filter(db.or_(Bug.title.ilike(f'%{search}%'), Bug.description.ilike(f'%{search}%')))
+        
+        if status:
+            query = query.filter_by(status=status)
+        
+        if assignee_id:
+            try:
+                query = query.filter_by(assignee_id=int(assignee_id))
+            except (ValueError, TypeError):
+                pass
+        
+        if priority:
+            query = query.filter_by(priority=priority)
+        
+        # Apply sorting
+        if sort_by == 'priority':
+            priority_order = {'critical': 1, 'high': 2, 'medium': 3, 'low': 4}
+            query = query.order_by(db.case(priority_order, value=Bug.priority))
+        elif sort_by == 'status':
+            query = query.order_by(Bug.status)
+        else:
+            order_col = Bug.created_at if sort_by == 'created_at' else Bug.updated_at
+            query = query.order_by(order_col.desc() if sort_order == 'desc' else order_col.asc())
+        
+        # Get bugs - all or paginated
+        if export_all:
+            bugs = query.all()
+        else:
+            bugs = query.paginate(page=page, per_page=20).items
+        
+        # Check if there are any bugs to export
+        if not bugs:
+            flash('No bugs found to export.', 'warning')
+            return redirect(url_for('bugs.list_bugs', search=search, status=status, 
+                                   assignee_id=assignee_id, priority=priority, page=page))
+        
+        # Limit exports to max bugs
+        max_bugs = 500
+        if len(bugs) > max_bugs:
+            bugs = bugs[:max_bugs]
+            flash(f'Export limited to {max_bugs} bugs.', 'info')
+        
+        # Prepare filters information for report
+        filters_applied = {
+            'search': search,
+            'status': status,
+            'priority': priority,
+        }
+        
+        # Add assignee name if filtering by assignee
+        if assignee_id:
+            try:
+                assignee = User.query.get(int(assignee_id))
+                filters_applied['assignee_id'] = assignee_id
+                filters_applied['assignee_name'] = assignee.username if assignee else 'Unknown'
+            except (ValueError, TypeError):
+                pass
+        
+        # Generate PDF
+        pdf_generator = BugReportGenerator(
+            bugs=bugs,
+            current_user=current_user,
+            filters_applied=filters_applied
+        )
+        
+        pdf_buffer = pdf_generator.generate_pdf()
+        
+        # Generate filename with current date
+        filename = f"BugReport_{datetime.utcnow().strftime('%Y-%m-%d')}.pdf"
+        
+        # Return PDF as download
+        return send_file(
+            pdf_buffer,
+            mimetype='application/pdf',
+            as_attachment=True,
+            download_name=filename
+        )
+        
+    except Exception as e:
+        flash(f'Error generating PDF: {str(e)}', 'error')
+        return redirect(url_for('bugs.list_bugs'))
+
