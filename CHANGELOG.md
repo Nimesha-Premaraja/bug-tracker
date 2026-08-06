@@ -18,6 +18,11 @@
 * [#15](https://github.com/Nimesha-Premaraja/bug-tracker/pull/15): chore: add helm charts
 
 
+# Version: v2.0.1
+
+* [#15](https://github.com/Nimesha-Premaraja/bug-tracker/pull/15): chore: add helm charts
+
+
 # Version: v1.0.2
 
 * [#7](https://github.com/Nimesha-Premaraja/bug-tracking-system/pull/7): refactor: update Changelog CI workflow to trigger on pull requests
