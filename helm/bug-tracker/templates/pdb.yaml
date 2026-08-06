@@ -3,6 +3,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: {{ include "bug-tracker.fullname" . }}-pdb
+  namespace: {{ .Values.namespace }}
   labels:
     {{- include "bug-tracker.labels" . | nindent 4 }}
 spec:
