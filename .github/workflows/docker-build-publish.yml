@@ -6,6 +6,9 @@ on:
       - main
     tags:
       - "v*.*.*"
+  release:
+    types:
+      - published
   workflow_dispatch:
 
 jobs:
@@ -25,10 +28,17 @@ jobs:
         run: echo "IMAGE=ghcr.io/$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')/docker/bug-tracker" >> "$GITHUB_ENV"
 
       - name: Generate release image tag
+        if: github.ref_type == 'tag' || github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          RELEASE_VERSION="${GITHUB_REF_NAME#v}"
+          if [ "${{ github.event_name }}" = "release" ]; then
+            RELEASE_ID="${{ github.event.release.id }}"
+          else
+            RELEASE_ID=$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${GITHUB_REF_NAME}" --jq '.id')
+          fi
           RANDOM_HASH=$(openssl rand -hex 3)
-          echo "RELEASE_IMAGE_TAG=${RELEASE_VERSION}-${RANDOM_HASH}" >> "$GITHUB_ENV"
+          echo "RELEASE_IMAGE_TAG=${RELEASE_ID}-${RANDOM_HASH}" >> "$GITHUB_ENV"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -47,7 +57,7 @@ jobs:
           images: ${{ env.IMAGE }}
           tags: |
             type=raw,value=latest
-            type=raw,value=${{ env.RELEASE_IMAGE_TAG }}
+            type=raw,value=${{ env.RELEASE_IMAGE_TAG }},enable=${{ github.ref_type == 'tag' || github.event_name == 'release' }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
 
