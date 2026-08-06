@@ -37,7 +37,7 @@ jobs:
           fi
 
           random_hash=$(openssl rand -hex 4)
-          chart_version="${base_version}:${random_hash}"
+          chart_version="${base_version}+${random_hash}"
           oci_tag="${base_version}_${random_hash}"
 
           echo "release_tag=$release_tag" >> "$GITHUB_OUTPUT"
