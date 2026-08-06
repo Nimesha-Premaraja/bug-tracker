@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "bug-tracker.fullname" . }}-config
+  labels:
+    {{- include "bug-tracker.labels" . | nindent 4 }}
+data:
+  FLASK_ENV: {{ .Values.env.FLASK_ENV | quote }}
+  FLASK_APP: {{ .Values.env.FLASK_APP | quote }}
+  UPLOAD_FOLDER: {{ .Values.env.UPLOAD_FOLDER | quote }}

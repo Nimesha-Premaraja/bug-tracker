@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for
+from flask import Flask, redirect, url_for, jsonify
 from flask_login import LoginManager
 from config import config
 from app.models import db, User
@@ -42,9 +42,25 @@ def create_app(config_name='development'):
         app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
         app.register_blueprint(users_bp, url_prefix='/users')
         
-        @app.route('/')
-        def index():
-            return redirect(url_for('dashboard.dashboard'))
+    @app.route('/')
+    def index():
+        return redirect(url_for('dashboard.dashboard'))
+
+    @app.route('/health')
+    def health():
+        """Health endpoint used by Kubernetes liveness/readiness probes.
+
+        Returns 200 when the application can access the database, otherwise 500.
+        This is intentionally lightweight to avoid heavy startup checks.
+        """
+        try:
+            # lightweight DB check
+            db.session.execute('SELECT 1')
+        except Exception as e:
+            logger.exception("Health check failed: %s", e)
+            return jsonify(status='error'), 500
+
+        return jsonify(status='ok'), 200
     
     return app
 
