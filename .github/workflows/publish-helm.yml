@@ -11,7 +11,6 @@ env:
   CHART_DIR: helm/bug-tracker
   REGISTRY: ghcr.io
   REGISTRY_NAMESPACE: nimesha-premaraja
-  REGISTRY_USERNAME: Nimesha-Premaraja
 
 jobs:
   publish:
@@ -22,6 +21,8 @@ jobs:
 
       - name: Set up Helm
         uses: azure/setup-helm@v4
+        with:
+          version: v3.14.0
 
       - name: Calculate chart version
         id: chart_version
@@ -55,8 +56,12 @@ jobs:
             --app-version "${{ steps.chart_version.outputs.release_tag }}" \
             --destination .helm-packages
 
-      - name: Login to GHCR
-        run: echo "${{ secrets.GHCR_TOKEN }}" | helm registry login "$REGISTRY" --username "$REGISTRY_USERNAME" --password-stdin
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push chart to GHCR
         run: |
