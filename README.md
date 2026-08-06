@@ -6,9 +6,8 @@ This Bug Tracking System is built with Python Flask and PostgreSQL, designed to 
 
 ### Infrastructure and Platform
 - **Containerization**: Docker
-- **Orchestration**: Docker Compose
+- **Orchestration**: Docker Compose, Kubernetes, Helm
 - **Web Server**: Gunicorn
-- **Reverse Proxy**: Can use Nginx
 
 ### Backend
 - **Framework**: Flask 3.0.3
@@ -25,6 +24,9 @@ This Bug Tracking System is built with Python Flask and PostgreSQL, designed to 
 - **Charts**: Chart.js 4.4.0
 
 ## Features
+
+<details>
+<summary><b>Click to extract features</b></summary>
 
 ### Authentication
 - Login / Logout
@@ -68,14 +70,19 @@ This Bug Tracking System is built with Python Flask and PostgreSQL, designed to 
 - Bugs by priority chart (bar)
 - Recent bugs activity feed
 
+</details>
+
 ### Prerequisites
+---
 
 - Docker
 - Docker Compose
+- Helm
 
-## Installation & Setup
+### Installation & Setup
 
-### Local Development (Docker Compose)
+<details>
+<summary><b>Local Development (Docker Compose)</b></summary>
 
 1. Clone the repository and navigate to the bug-tracker directory:
 ```bash
@@ -97,7 +104,11 @@ docker-compose up -d --build
 - Backend API: http://localhost:5000/api
 - Database: localhost:5432
 
-## Default Credentials
+</details>
+
+---
+
+### Default Credentials
 
 Login with these credentials:
 
