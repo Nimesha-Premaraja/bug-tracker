@@ -1,4 +1,4 @@
-name: Publish Helm Chart to GHCR
+name: Helm Package and Publish
 
 on:
   workflow_dispatch: {}
@@ -7,65 +7,64 @@ permissions:
   contents: read
   packages: write
 
+env:
+  CHART_DIR: helm/bug-tracker
+  REGISTRY: ghcr.io
+  REGISTRY_NAMESPACE: nimesha-premaraja
+
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Install utilities
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y jq openssl
 
       - name: Set up Helm
         uses: azure/setup-helm@v4
         with:
-          version: "3.13.2"
+          version: v3.14.0
 
-      - name: Get latest release id
-        id: get_release
+      - name: Calculate chart version
+        id: chart_version
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          owner_repo="${GITHUB_REPOSITORY}"
-          api_url="https://api.github.com/repos/${owner_repo}/releases/latest"
-          echo "Querying $api_url"
-          release_id=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" "$api_url" | jq -r '.id // empty')
-          if [ -z "$release_id" ]; then
-            echo "No release found; falling back to run id"
-            release_id="${GITHUB_RUN_ID}"
+          release_tag=$(gh release view --json tagName --jq '.tagName')
+          base_version="${release_tag#v}"
+
+          if ! [[ "$base_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Latest release tag must be a semantic version like v1.2.3 or 1.2.3, got: $release_tag"
+            exit 1
           fi
-          echo "release_id=$release_id" >> "$GITHUB_OUTPUT"
 
-      - name: Generate tag
-        id: tag
-        run: |
-          rnd=$(openssl rand -hex 6)
-          tag="${{ steps.get_release.outputs.release_id }}-${rnd}"
-          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          random_hash=$(openssl rand -hex 4)
+          chart_version="${base_version}-${random_hash}"
+          oci_tag="$chart_version"
 
-      - name: Login to GHCR
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u "${{ github.actor }}" --password-stdin
+          echo "release_tag=$release_tag" >> "$GITHUB_OUTPUT"
+          echo "chart_version=$chart_version" >> "$GITHUB_OUTPUT"
+          echo "oci_tag=$oci_tag" >> "$GITHUB_OUTPUT"
 
-      - name: Save chart to OCI
+      - name: Lint chart
+        run: helm lint "$CHART_DIR"
+
+      - name: Package chart
         run: |
-          owner=$(echo "$GITHUB_REPOSITORY" | cut -d'/' -f1)
-          repo=$(echo "$GITHUB_REPOSITORY" | cut -d'/' -f2)
-          chart_ref="ghcr.io/${owner}/${repo}:${{ steps.tag.outputs.tag }}"
-          echo "Saving chart as $chart_ref"
-          helm chart save ./helm/bug-tracker "$chart_ref"
+          mkdir -p .helm-packages
+          helm package "$CHART_DIR" \
+            --version "${{ steps.chart_version.outputs.chart_version }}" \
+            --app-version "${{ steps.chart_version.outputs.release_tag }}" \
+            --destination .helm-packages
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push chart to GHCR
         run: |
-          owner=$(echo "$GITHUB_REPOSITORY" | cut -d'/' -f1)
-          repo=$(echo "$GITHUB_REPOSITORY" | cut -d'/' -f2)
-          chart_ref="ghcr.io/${owner}/${repo}:${{ steps.tag.outputs.tag }}"
-          echo "Pushing chart $chart_ref"
-          helm chart push "$chart_ref"
-
-      - name: Output pushed chart reference
-        run: |
-          echo "Chart pushed to: ghcr.io/${GITHUB_REPOSITORY}:${{ steps.tag.outputs.tag }}"
+          chart_package=$(ls .helm-packages/*.tgz)
+          helm push "$chart_package" "oci://$REGISTRY/$REGISTRY_NAMESPACE"
+          echo "Published chart: oci://$REGISTRY/$REGISTRY_NAMESPACE/bug-tracker:${{ steps.chart_version.outputs.oci_tag }}"
