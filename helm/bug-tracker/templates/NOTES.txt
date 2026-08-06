@@ -1,0 +1,11 @@
+Thank you for installing the bug-tracker chart.
+
+1. Get the application URL by running these commands:
+
+  export POD_NAME=$(kubectl get pods -l app={{ include "bug-tracker.fullname" . }} -o jsonpath="{.items[0].metadata.name}")
+  kubectl port-forward $POD_NAME 5000:5000
+
+Then open http://127.0.0.1:5000
+
+2. Secrets
+  - SECRET_KEY and DATABASE_URL are stored in a Kubernetes Secret named: {{ include "bug-tracker.fullname" . }}-secret

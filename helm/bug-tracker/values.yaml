@@ -1,0 +1,76 @@
+# Default values for bug-tracker.
+
+replicaCount: 2
+
+image:
+  repository: Nimesha-Premaraja/bug-tracker
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+readinessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 3
+  path: /health
+
+livenessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 20
+  timeoutSeconds: 5
+  path: /health
+
+env:
+  FLASK_ENV: production
+  FLASK_APP: wsgi.py
+  UPLOAD_FOLDER: /app/app/uploads
+
+secret:
+  # Provide these via Helm --set or a separate kubernetes Secret manifest in production
+  SECRET_KEY: "changeme"
+  DATABASE_URL: "postgresql://buguser:bugpass@postgres:5432/bugtracker"
+
+persistence:
+  enabled: true
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  storageClass: ""
+
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 60
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+securityContext:
+  runAsUser: 1000
+  fsGroup: 1000
+
+podAnnotations: {}
+nodeSelector: {}
+tolerations: []
