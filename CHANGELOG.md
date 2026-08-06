@@ -2,6 +2,20 @@
 
 * [#15](https://github.com/Nimesha-Premaraja/bug-tracker/pull/15): chore: add helm charts
 * [#16](https://github.com/Nimesha-Premaraja/bug-tracker/pull/16): fix: update Publish Helm GH Action
+* [#17](https://github.com/Nimesha-Premaraja/bug-tracker/pull/17): Helm package
+
+
+# Version: v2.0.1
+
+* [#15](https://github.com/Nimesha-Premaraja/bug-tracker/pull/15): chore: add helm charts
+* [#16](https://github.com/Nimesha-Premaraja/bug-tracker/pull/16): fix: update Publish Helm GH Action
+* [#17](https://github.com/Nimesha-Premaraja/bug-tracker/pull/17): Helm package
+
+
+# Version: v2.0.1
+
+* [#15](https://github.com/Nimesha-Premaraja/bug-tracker/pull/15): chore: add helm charts
+* [#16](https://github.com/Nimesha-Premaraja/bug-tracker/pull/16): fix: update Publish Helm GH Action
 
 
 # Version: v2.0.1
