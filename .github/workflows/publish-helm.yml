@@ -1,4 +1,4 @@
-name: Publish Helm Chart to GHCR
+name: Helm Package and Publish
 
 on:
   workflow_dispatch: {}
