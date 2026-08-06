@@ -3,6 +3,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ include "bug-tracker.fullname" . }}-hpa
+  namespace: {{ .Values.namespace }}
   labels:
     {{- include "bug-tracker.labels" . | nindent 4 }}
 spec:

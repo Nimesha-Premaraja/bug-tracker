@@ -1,5 +1,8 @@
 # Default values for bug-tracker.
 
+# Kubernetes namespace for deploying bug-tracker
+namespace: "bug-tracker"
+
 replicaCount: 2
 
 image:
