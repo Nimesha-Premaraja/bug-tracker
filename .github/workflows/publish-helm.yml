@@ -50,22 +50,17 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: Save chart to OCI
+      - name: Package and push chart to OCI
         run: |
           owner=$(echo "$GITHUB_REPOSITORY" | cut -d'/' -f1)
           repo=$(echo "$GITHUB_REPOSITORY" | cut -d'/' -f2)
-          chart_ref="ghcr.io/${owner}/${repo}:${{ steps.tag.outputs.tag }}"
-          echo "Saving chart as $chart_ref"
-          helm chart save ./helm/bug-tracker "$chart_ref"
-
-      - name: Push chart to GHCR
-        run: |
-          owner=$(echo "$GITHUB_REPOSITORY" | cut -d'/' -f1)
-          repo=$(echo "$GITHUB_REPOSITORY" | cut -d'/' -f2)
-          chart_ref="ghcr.io/${owner}/${repo}:${{ steps.tag.outputs.tag }}"
-          echo "Pushing chart $chart_ref"
-          helm chart push "$chart_ref"
+          chart_ref="ghcr.io/${owner}/${repo}"
+          echo "Packaging chart"
+          helm package ./helm/bug-tracker
+          pkg=$(ls -t bug-tracker-*.tgz | head -n 1)
+          echo "Pushing $pkg to $chart_ref:${{ steps.tag.outputs.tag }}"
+          helm push "$pkg" "oci://${chart_ref}"
 
       - name: Output pushed chart reference
         run: |
-          echo "Chart pushed to: ghcr.io/${GITHUB_REPOSITORY}:${{ steps.tag.outputs.tag }}"
+          echo "Chart pushed to: oci://ghcr.io/${GITHUB_REPOSITORY}:${{ steps.tag.outputs.tag }}"
