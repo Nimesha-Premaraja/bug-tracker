@@ -31,6 +31,15 @@
 * [#16](https://github.com/Nimesha-Premaraja/bug-tracker/pull/16): fix: update Publish Helm GH Action
 * [#17](https://github.com/Nimesha-Premaraja/bug-tracker/pull/17): Helm package
 * [#18](https://github.com/Nimesha-Premaraja/bug-tracker/pull/18): refactor: update Docker build workflow 
+* [#19](https://github.com/Nimesha-Premaraja/bug-tracker/pull/19): feat: add namespace configuration to Helm templates
+
+
+# Version: v2.0.1
+
+* [#15](https://github.com/Nimesha-Premaraja/bug-tracker/pull/15): chore: add helm charts
+* [#16](https://github.com/Nimesha-Premaraja/bug-tracker/pull/16): fix: update Publish Helm GH Action
+* [#17](https://github.com/Nimesha-Premaraja/bug-tracker/pull/17): Helm package
+* [#18](https://github.com/Nimesha-Premaraja/bug-tracker/pull/18): refactor: update Docker build workflow 
 
 
 # Version: v2.0.1
