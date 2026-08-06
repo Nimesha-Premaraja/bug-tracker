@@ -43,8 +43,9 @@ jobs:
         with:
           images: ${{ env.IMAGE }}
           tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
-            # Use semantic version tags from repository releases (triggered by v*.*.* tags)
+            # Always emit a latest tag so build-push has at least one tag to push.
+            # Semver tags from releases will also be emitted when present.
+            type=raw,value=latest
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
 
