@@ -33,7 +33,7 @@ jobs:
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             RELEASE="${GITHUB_REF#refs/tags/}"
           else
-            RELEASE="dev"
+            RELEASE="0.0.0"
           fi
 
           RANDOM_HASH=$(openssl rand -hex 4 | cut -c1-7)
