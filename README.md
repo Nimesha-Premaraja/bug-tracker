@@ -78,6 +78,7 @@ This Bug Tracking System is built with Python Flask and PostgreSQL, designed to 
 - Docker
 - Docker Compose
 - Helm
+- Docker Desktop with at least 4GB memory available for the local ELK stack
 
 ### Installation & Setup
 
@@ -103,6 +104,80 @@ docker-compose up -d --build
 - Frontend: http://localhost:5000
 - Backend API: http://localhost:5000/api
 - Database: localhost:5432
+- Elasticsearch: http://localhost:9200
+- Kibana: http://localhost:5601
+
+5. Stop the application:
+```bash
+docker-compose down
+```
+
+6. Stop the application and remove local data volumes:
+```bash
+docker-compose down -v
+```
+
+</details>
+
+<details>
+<summary><b>Local Observability (ELK Stack)</b></summary>
+
+The Docker Compose setup includes a local-only ELK stack for development log search:
+
+- Elasticsearch stores logs at http://localhost:9200
+- Kibana provides the UI at http://localhost:5601
+- Filebeat collects Docker stdout/stderr logs from the `bugtracker-web` container only
+
+The local Elasticsearch and Kibana services run with Elastic security disabled and are intended only for local development. Do not expose these ports publicly.
+
+Application logs are emitted as JSON to stdout. Gunicorn access logs are emitted to stdout and error logs to stderr. Filebeat harvests the web container logs from Docker, enriches them with container metadata, and writes them to daily indices named `bug-tracker-logs-*`.
+
+Start or rebuild the full local stack:
+
+```bash
+docker-compose up -d --build
+```
+
+Check service status:
+
+```bash
+docker-compose ps
+```
+
+Validate Elasticsearch health:
+
+```bash
+curl http://localhost:9200/_cluster/health?pretty
+```
+
+Open Kibana, then create a data view with this index pattern:
+
+```text
+bug-tracker-logs-*
+```
+
+Use `@timestamp` as the time field. In Discover, useful fields include `message`, `log.level`, `log.logger`, `event.dataset`, `http.request.method`, `http.response.status_code`, `url.original`, `container.name`, and `service.name`.
+
+Generate access and application log events:
+
+```bash
+curl http://localhost:5000/
+curl http://localhost:5000/health
+```
+
+Inspect indexed events directly:
+
+```bash
+curl "http://localhost:9200/bug-tracker-logs-*/_search?pretty&size=5"
+```
+
+Check Filebeat logs if events are missing:
+
+```bash
+docker-compose logs filebeat
+```
+
+User-uploaded attachments under `app/uploads`, including uploaded `.log` files, are not harvested by Filebeat.
 
 </details>
 
@@ -206,6 +281,8 @@ FLASK_APP=wsgi.py
 SECRET_KEY=your-secret-key-here                # Change in production!
 DATABASE_URL=postgresql://user:pass@host:port/db
 UPLOAD_FOLDER=app/uploads
+LOG_LEVEL=INFO                                 # Python/Gunicorn log level
+GUNICORN_WORKERS=1                             # Local Compose worker count
 ```
 
 ### Security Features
@@ -263,6 +340,16 @@ To test the application:
 4. Test file uploads
 5. Test search and filters
 6. Test role permissions
+
+### Code Validation
+
+Run static validation commands:
+
+```bash
+ruff check .
+python3 -I -m compileall -q app config.py wsgi.py gunicorn.conf.py
+docker-compose config
+```
 
 ### Deployment
 
