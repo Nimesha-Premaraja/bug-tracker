@@ -2,13 +2,15 @@ from flask import Flask, redirect, url_for, jsonify
 from flask_login import LoginManager
 from config import config
 from app.models import db, User
-import os
 import logging
+from sqlalchemy import text
+from app.logging_config import configure_logging
 
 login_manager = LoginManager()
 logger = logging.getLogger(__name__)
 
 def create_app(config_name='development'):
+    configure_logging()
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     
@@ -21,16 +23,16 @@ def create_app(config_name='development'):
     def load_user(user_id):
         try:
             return User.query.get(int(user_id))
-        except Exception as e:
-            logger.error(f"Error loading user {user_id}: {str(e)}")
+        except Exception:
+            logger.exception("Error loading user", extra={"user.id": user_id})
             return None
     
     with app.app_context():
         try:
             db.create_all()
             seed_default_users()
-        except Exception as e:
-            logger.error(f"Error initializing database: {str(e)}")
+        except Exception:
+            logger.exception("Error initializing database")
         
         from app.routes.auth import auth_bp
         from app.routes.bugs import bugs_bp
@@ -55,9 +57,9 @@ def create_app(config_name='development'):
         """
         try:
             # lightweight DB check
-            db.session.execute('SELECT 1')
-        except Exception as e:
-            logger.exception("Health check failed: %s", e)
+            db.session.execute(text('SELECT 1'))
+        except Exception:
+            logger.exception("Health check failed")
             return jsonify(status='error'), 500
 
         return jsonify(status='ok'), 200

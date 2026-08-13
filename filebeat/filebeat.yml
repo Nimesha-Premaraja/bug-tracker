@@ -1,0 +1,52 @@
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: false
+      templates:
+        - condition:
+            or:
+              - equals:
+                  docker.container.name: bugtracker-web
+              - equals:
+                  docker.container.labels.com_docker_compose_service: web
+          config:
+            - type: filestream
+              id: bug-tracker-web-${data.docker.container.id}
+              prospector.scanner.symlinks: true
+              paths:
+                - /var/lib/docker/containers/${data.docker.container.id}/*.log
+              parsers:
+                - container: ~
+                - ndjson:
+                    target: ""
+                    add_error_key: true
+                    overwrite_keys: true
+                    expand_keys: true
+
+processors:
+  - add_docker_metadata:
+      host: unix:///var/run/docker.sock
+  - add_fields:
+      target: service
+      fields:
+        name: bug-tracker
+        environment: local
+  - add_fields:
+      target: event
+      fields:
+        module: bug-tracker
+
+setup.kibana:
+  host: http://kibana:5601
+
+setup.template.name: bug-tracker-logs
+setup.template.pattern: bug-tracker-logs-*
+setup.ilm.enabled: false
+setup.template.overwrite: false
+setup.template.json.enabled: false
+
+output.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]
+  index: "bug-tracker-logs-%{+yyyy.MM.dd}"
+
+logging.level: info
