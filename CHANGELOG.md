@@ -3,6 +3,11 @@
 * [#27](https://github.com/Nimesha-Premaraja/bug-tracker/pull/27): chore: Add Docker Scout action for vulnerability scanning in pull requests
 
 
+# Version: v2.1.0
+
+* [#27](https://github.com/Nimesha-Premaraja/bug-tracker/pull/27): chore: Add Docker Scout action for vulnerability scanning in pull requests
+
+
 # Version: 0.0.0
 
 * [#15](https://github.com/Nimesha-Premaraja/bug-tracker/pull/15): chore: add helm charts
