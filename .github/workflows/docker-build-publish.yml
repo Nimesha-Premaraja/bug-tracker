@@ -80,8 +80,7 @@ jobs:
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ env.IMAGE }}:${{ steps.tag.outputs.tag }}
-          format: template
-          template: "@/contrib/pr-comment.tpl"
+          format: table
           output: trivy-results.md
           ignore-unfixed: true
           vuln-type: 'os,library'
@@ -102,7 +101,9 @@ jobs:
 
             **Image:** \`${process.env.IMAGE_REF}\`
 
-            ${report}`;
+            \`\`\`text
+            ${report}
+            \`\`\``;
             const { owner, repo } = context.repo;
             const issue_number = context.issue.number;
             const comments = await github.paginate(github.rest.issues.listComments, {
