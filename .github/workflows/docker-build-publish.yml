@@ -101,9 +101,13 @@ jobs:
 
             **Image:** \`${process.env.IMAGE_REF}\`
 
+            <details>
+            <summary>Report Summary</summary>
+
             \`\`\`text
             ${report}
-            \`\`\``;
+            \`\`\`
+            </details>`;
             const { owner, repo } = context.repo;
             const issue_number = context.issue.number;
             const comments = await github.paginate(github.rest.issues.listComments, {
