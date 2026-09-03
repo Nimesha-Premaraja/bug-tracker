@@ -1,6 +1,12 @@
 # Version: v2.1.0
 
 * [#27](https://github.com/Nimesha-Premaraja/bug-tracker/pull/27): chore: Add Docker Scout action for vulnerability scanning in pull requests
+* [#28](https://github.com/Nimesha-Premaraja/bug-tracker/pull/28): chore: Add pull request trigger for Docker image build workflow
+
+
+# Version: v2.1.0
+
+* [#27](https://github.com/Nimesha-Premaraja/bug-tracker/pull/27): chore: Add Docker Scout action for vulnerability scanning in pull requests
 
 
 # Version: v2.1.0

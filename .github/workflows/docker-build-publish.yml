@@ -97,7 +97,7 @@ jobs:
             const marker = '<!-- trivy-image-scan-summary -->';
             const report = fs.readFileSync('trivy-results.md', 'utf8');
             const body = `${marker}
-            ## Trivy Image Scan
+            ## Docker Image Scan
 
             **Image:** \`${process.env.IMAGE_REF}\`
 
